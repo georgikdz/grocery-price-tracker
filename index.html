@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html lang="bg"> 
+<html lang="bg">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>СпестиСмарт - Сравни цени на храни</title>
+    <meta name="description" content="Сравни цени на основни храни от Lidl, BILLA и Kaufland. Намери най-добрите оферти и спести пари.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <style>
         * {
             margin: 0;
@@ -16,6 +20,9 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .container {
@@ -44,6 +51,14 @@
             opacity: 0.9;
         }
         
+        .visitor-info {
+            text-align: center;
+            padding: 15px;
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: 500;
+        }
+        
         .update-section {
             background: #f8f9fa;
             padding: 20px;
@@ -60,10 +75,106 @@
             cursor: pointer;
             font-size: 16px;
             margin: 10px;
+            transition: all 0.3s ease;
         }
         
         .update-btn:hover {
             background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .update-btn.share {
+            background: #1976d2;
+        }
+        
+        .update-btn.share:hover {
+            background: #1565c0;
+        }
+        
+        .extraction-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .extraction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .retailer-extraction {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .retailer-extraction h4 {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .retailer-extraction.lidl h4 {
+            color: #0050AA;
+        }
+        
+        .retailer-extraction.billa h4 {
+            color: #E31E24;
+        }
+        
+        .retailer-extraction.kaufland h4 {
+            color: #FFD500;
+        }
+        
+        .extraction-textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .extract-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .extract-btn.lidl {
+            background: #0050AA;
+            color: white;
+        }
+        
+        .extract-btn.billa {
+            background: #E31E24;
+            color: white;
+        }
+        
+        .extract-btn.kaufland {
+            background: #FFD500;
+            color: black;
+        }
+        
+        .extract-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .extraction-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            display: none;
         }
         
         .stats-panel {
@@ -80,6 +191,11 @@
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
             text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
         }
         
         .stat-number {
@@ -150,13 +266,6 @@
             font-weight: bold;
         }
         
-        .update-info {
-            text-align: center;
-            padding: 20px;
-            background: #e9ecef;
-            color: #6c757d;
-        }
-        
         .edit-mode {
             background: #fff3cd !important;
             border: 2px solid #ffc107;
@@ -168,11 +277,104 @@
             font-weight: bold;
             width: 80px;
             text-align: center;
+            font-family: inherit;
+        }
+        
+        .editable:focus {
+            outline: 2px solid #667eea;
+            border-radius: 3px;
+        }
+        
+        .help-section {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .help-btn {
+            background: none;
+            border: 1px solid #667eea;
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .help-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .help-content {
+            display: none;
+            margin-top: 20px;
+            text-align: left;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .help-content ol {
+            margin-left: 20px;
+        }
+        
+        .help-content li {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        
+        .update-info {
+            text-align: center;
+            padding: 20px;
+            background: #e9ecef;
+            color: #6c757d;
+        }
+        
+        .quick-actions {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        
+        .fab {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+            font-size: 24px;
+            margin: 10px 0;
+            display: block;
+            transition: all 0.3s ease;
+        }
+        
+        .fab:hover {
+            background: #5a6fd8;
+            transform: scale(1.1);
         }
         
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
             .header h1 {
                 font-size: 2em;
+            }
+            
+            .header p {
+                font-size: 1em;
             }
             
             .stats-panel {
@@ -188,6 +390,35 @@
                 padding: 10px;
                 font-size: 0.9em;
             }
+            
+            .extraction-section {
+                padding: 15px;
+            }
+            
+            .extraction-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .extraction-textarea {
+                height: 80px;
+            }
+            
+            .update-btn {
+                padding: 10px 16px;
+                font-size: 14px;
+                margin: 5px;
+            }
+            
+            .quick-actions {
+                bottom: 15px;
+                right: 15px;
+            }
+            
+            .fab {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
         }
     </style>
 </head>
@@ -196,6 +427,10 @@
         <div class="header">
             <h1>🛒 СпестиСмарт</h1>
             <p>Сравни цени на основни храни | <span id="currentWeek"></span></p>
+        </div>
+        
+        <div class="visitor-info">
+            <p>👥 Посетители днес: <span id="visitor-count">1</span> | 💾 Данни запазени локално</p>
         </div>
         
         <div class="update-section">
@@ -207,6 +442,51 @@
             <button class="update-btn" onclick="saveChanges()" id="saveBtn" style="display: none;">
                 Запази промените
             </button>
+            <button class="update-btn share" onclick="shareWebsite()">
+                📤 Сподели сайта
+            </button>
+        </div>
+        
+        <div class="extraction-section">
+            <h3>🔍 Бърза проверка на цени</h3>
+            <p>Копирай текст от брошурите и намери цените автоматично</p>
+            
+            <div class="extraction-grid">
+                <div class="retailer-extraction lidl">
+                    <h4>📄 Lidl брошура</h4>
+                    <textarea id="lidl-text" class="extraction-textarea" 
+                             placeholder="Копирай текст от Lidl брошурата тук..."></textarea>
+                    <button onclick="extractPrices('lidl')" class="extract-btn lidl">
+                        Извлечи цени
+                    </button>
+                </div>
+                
+                <div class="retailer-extraction billa">
+                    <h4>📄 BILLA брошура</h4>
+                    <textarea id="billa-text" class="extraction-textarea" 
+                             placeholder="Копирай текст от BILLA брошурата тук..."></textarea>
+                    <button onclick="extractPrices('billa')" class="extract-btn billa">
+                        Извлечи цени
+                    </button>
+                </div>
+                
+                <div class="retailer-extraction kaufland">
+                    <h4>📄 Kaufland брошура</h4>
+                    <textarea id="kaufland-text" class="extraction-textarea" 
+                             placeholder="Копирай текст от Kaufland брошурата тук..."></textarea>
+                    <button onclick="extractPrices('kaufland')" class="extract-btn kaufland">
+                        Извлечи цени
+                    </button>
+                </div>
+            </div>
+            
+            <div id="extraction-results" class="extraction-results">
+                <h4>✅ Намерени цени:</h4>
+                <div id="found-prices"></div>
+                <button onclick="applyExtractedPrices()" class="update-btn">
+                    Приложи тези цени
+                </button>
+            </div>
         </div>
         
         <div class="stats-panel" id="stats-panel">
@@ -253,10 +533,33 @@
             </div>
         </div>
         
+        <div class="help-section">
+            <button onclick="toggleHelp()" class="help-btn">
+                ❓ Как да използвам сайта?
+            </button>
+            
+            <div id="help-content" class="help-content">
+                <h4>📋 Инструкции:</h4>
+                <ol>
+                    <li><strong>Редактиране:</strong> Кликни "Редактирай цени" за да промениш цените директно в таблицата</li>
+                    <li><strong>Бърза проверка:</strong> Копирай текст от брошури в полетата по-горе за автоматично извличане на цени</li>
+                    <li><strong>Запазване:</strong> Винаги кликни "Запази промените" след редакция</li>
+                    <li><strong>Споделяне:</strong> Изпрати линка на приятели и семейство</li>
+                    <li><strong>Мобилен достъп:</strong> Сайтът работи отлично на телефон</li>
+                </ol>
+                <p><strong>💡 Съвет:</strong> Актуализирай цените всяка седмица в понеделник когато излизат новите брошури!</p>
+            </div>
+        </div>
+        
         <div class="update-info">
             <p>📅 Последно обновление: <span id="lastUpdate"></span></p>
             <p>💡 Съвет: Проверявай цените всяка седмица в понеделник</p>
         </div>
+    </div>
+
+    <div class="quick-actions">
+        <button class="fab" onclick="scrollToTop()" title="Към началото">↑</button>
+        <button class="fab" onclick="toggleEditMode()" title="Редактирай">✏️</button>
     </div>
 
     <script>
@@ -274,6 +577,20 @@
         ];
         
         let editMode = false;
+        let extractedPrices = {};
+        
+        // Product patterns for text extraction
+        const productPatterns = {
+            'олио': ['олио', 'слънчогледово', 'cooking oil'],
+            'домати': ['домати', 'tomato', 'чери'],
+            'хляб': ['хляб', 'bread', 'тост'],
+            'мляко': ['мляко', 'milk', 'прясно'],
+            'яйца': ['яйца', 'eggs', 'яйце'],
+            'кашкавал': ['кашкавал', 'сирене', 'cheese'],
+            'пилешко': ['пилешко', 'пиле', 'филе', 'chicken'],
+            'картофи': ['картофи', 'картоф', 'potatoes'],
+            'хартия': ['тоалетна', 'хартия', 'toilet paper']
+        };
         
         function loadPriceData() {
             const tbody = document.getElementById('priceTableBody');
@@ -359,8 +676,10 @@
             // Auto-refresh the table to update best prices
             setTimeout(() => {
                 loadPriceData();
-                toggleEditMode(); // Re-enable edit mode
-                toggleEditMode();
+                if (editMode) {
+                    toggleEditMode(); // Re-enable edit mode
+                    toggleEditMode();
+                }
             }, 100);
         }
         
@@ -372,6 +691,120 @@
             toggleEditMode();
             loadPriceData();
             alert('Цените са запазени успешно! 🎉');
+        }
+        
+        function extractPrices(retailer) {
+            const text = document.getElementById(`${retailer}-text`).value.toLowerCase();
+            const lines = text.split('\n');
+            const found = {};
+            
+            Object.keys(productPatterns).forEach(product => {
+                const patterns = productPatterns[product];
+                
+                for (let line of lines) {
+                    const hasKeyword = patterns.some(pattern => line.includes(pattern));
+                    
+                    if (hasKeyword) {
+                        // Look for price patterns: X.XX лв or X,XX лв
+                        const priceMatch = line.match(/(\d+[.,]\d{2})/);
+                        if (priceMatch) {
+                            const price = parseFloat(priceMatch[1].replace(',', '.'));
+                            found[product] = price;
+                            break;
+                        }
+                    }
+                }
+            });
+            
+            extractedPrices[retailer] = found;
+            displayExtractedPrices();
+        }
+        
+        function displayExtractedPrices() {
+            const resultsDiv = document.getElementById('extraction-results');
+            const foundDiv = document.getElementById('found-prices');
+            
+            let html = '';
+            let hasResults = false;
+            
+            Object.keys(extractedPrices).forEach(retailer => {
+                const prices = extractedPrices[retailer];
+                if (Object.keys(prices).length > 0) {
+                    hasResults = true;
+                    html += `<div style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 5px;">`;
+                    html += `<strong style="color: ${retailer === 'lidl' ? '#0050AA' : retailer === 'billa' ? '#E31E24' : '#FFD500'};">${retailer.toUpperCase()}:</strong> `;
+                    Object.keys(prices).forEach(product => {
+                        html += `${product}: ${prices[product]} лв, `;
+                    });
+                    html = html.slice(0, -2); // Remove last comma
+                    html += '</div>';
+                }
+            });
+            
+            if (hasResults) {
+                foundDiv.innerHTML = html;
+                resultsDiv.style.display = 'block';
+            } else {
+                resultsDiv.style.display = 'none';
+            }
+        }
+        
+        function applyExtractedPrices() {
+            Object.keys(extractedPrices).forEach(retailer => {
+                const prices = extractedPrices[retailer];
+                
+                Object.keys(prices).forEach(productKey => {
+                    // Find matching product in groceryData
+                    groceryData.forEach((product, index) => {
+                        if (product.name.toLowerCase().includes(productKey)) {
+                            product[retailer] = prices[productKey];
+                        }
+                    });
+                });
+            });
+            
+            loadPriceData();
+            alert('Цените са приложени! Не забравяйте да ги запазите.');
+            
+            // Clear extraction results
+            extractedPrices = {};
+            document.getElementById('extraction-results').style.display = 'none';
+            document.querySelectorAll('.extraction-textarea').forEach(textarea => {
+                textarea.value = '';
+            });
+        }
+        
+        function shareWebsite() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'СпестиСмарт - Сравни цени на храни',
+                    text: 'Вижте най-добрите цени на основни храни в България!',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback for desktop
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    alert('Линкът е копиран! Споделете го с приятели.');
+                }).catch(() => {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = window.location.href;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert('Линкът е копиран! Споделете го с приятели.');
+                });
+            }
+        }
+        
+        function toggleHelp() {
+            const helpContent = document.getElementById('help-content');
+            helpContent.style.display = helpContent.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function scrollToTop() {
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
         
         function loadSavedData() {
@@ -396,11 +829,37 @@
             return `Седмица ${week}, ${now.getFullYear()}`;
         }
         
+        function initVisitorCounter() {
+            let visitors = localStorage.getItem('visitors') || 0;
+            visitors++;
+            localStorage.setItem('visitors', visitors);
+            document.getElementById('visitor-count').textContent = visitors;
+        }
+        
+        // Show/hide FAB based on scroll
+        window.addEventListener('scroll', () => {
+            const fab = document.querySelector('.quick-actions');
+            if (window.scrollY > 300) {
+                fab.style.opacity = '1';
+            } else {
+                fab.style.opacity = '0.7';
+            }
+        });
+        
         // Load data when page loads
         document.addEventListener('DOMContentLoaded', () => {
             loadSavedData();
             loadPriceData();
+            initVisitorCounter();
             document.getElementById('currentWeek').textContent = getCurrentWeek();
+        });
+        
+        // Prevent form submission on Enter key in input fields
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target.classList.contains('editable')) {
+                e.preventDefault();
+                e.target.blur();
+            }
         });
     </script>
 </body>
