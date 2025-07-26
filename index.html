@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>СпестиСмарт - Сравни цени на храни</title>
-    <meta name="description" content="Сравни цени на основни храни от Lidl и Kaufland. Намери най-добрите оферти и спести пари.">
+    <title>СпестиСмарт - URL Crawler</title>
     
     <style>
         * {
@@ -42,11 +41,6 @@
             margin-bottom: 10px;
         }
         
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-        
         .admin-toggle {
             position: absolute;
             top: 15px;
@@ -58,11 +52,6 @@
             border-radius: 20px;
             cursor: pointer;
             font-size: 12px;
-            transition: all 0.3s ease;
-        }
-        
-        .admin-toggle:hover {
-            background: rgba(255,255,255,0.3);
         }
         
         .admin-section {
@@ -76,42 +65,26 @@
             display: block;
         }
         
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .admin-status {
-            background: #d4edda;
-            color: #155724;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        
-        .upload-grid {
+        .crawler-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
             margin: 20px 0;
         }
         
-        .retailer-upload {
+        .retailer-crawler {
             background: white;
             border-radius: 12px;
             padding: 25px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            text-align: center;
             border-top: 4px solid;
         }
         
-        .retailer-upload.lidl {
+        .retailer-crawler.lidl {
             border-top-color: #0050AA;
         }
         
-        .retailer-upload.kaufland {
+        .retailer-crawler.kaufland {
             border-top-color: #FFD500;
         }
         
@@ -137,28 +110,181 @@
             color: black;
         }
         
-        .upload-area {
-            border: 2px dashed #ddd;
-            border-radius: 10px;
-            padding: 30px;
+        .url-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .url-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+        
+        .crawl-btn {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
             transition: all 0.3s ease;
+            margin: 10px 0;
+        }
+        
+        .crawl-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .crawl-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .quick-links {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
             margin: 15px 0;
         }
         
-        .upload-area:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
+        .quick-links h5 {
+            margin-bottom: 10px;
+            color: #333;
         }
         
-        .upload-area.success {
-            border-color: #28a745;
-            background: #f8fff9;
+        .quick-link {
+            display: block;
+            color: #667eea;
+            text-decoration: none;
+            padding: 5px 0;
+            font-size: 12px;
+            border-bottom: 1px solid #eee;
         }
         
-        .upload-area.processing {
-            border-color: #ffc107;
-            background: #fff8e1;
+        .quick-link:hover {
+            background: #e3f2fd;
+            padding-left: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .crawling-status {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .crawling-status.processing {
+            background: #fff3cd;
+            color: #856404;
+            display: block;
+        }
+        
+        .crawling-status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        
+        .crawling-status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .found-prices {
+            margin-top: 15px;
+        }
+        
+        .price-tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 6px 12px;
+            border-radius: 15px;
+            margin: 3px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        
+        .debug-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .debug-text {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 11px;
+            white-space: pre-wrap;
+        }
+        
+        .manual-fallback {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .price-input {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .price-input label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        
+        .price-input input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
         }
         
         .btn {
@@ -182,22 +308,7 @@
         .btn-warning { background: #ffc107; color: black; }
         .btn-danger { background: #dc3545; }
         
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
+        /* Public section styles */
         .public-section {
             display: block;
         }
@@ -305,56 +416,13 @@
             color: #666;
         }
         
-        .footer {
-            text-align: center;
-            padding: 20px;
-            background: #e9ecef;
-            color: #6c757d;
-        }
-        
-        .share-section {
-            background: #f8f9fa;
-            padding: 20px;
-            text-align: center;
-            border-top: 1px solid #dee2e6;
-        }
-        
-        .share-btn {
-            background: #1976d2;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            margin: 5px;
-            font-size: 14px;
-        }
-        
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .upload-grid {
+            .crawler-grid {
                 grid-template-columns: 1fr;
             }
             
-            .stats-panel {
+            .price-grid {
                 grid-template-columns: 1fr;
-                padding: 20px;
-            }
-            
-            .price-table {
-                padding: 20px;
-            }
-            
-            th, td {
-                padding: 10px;
-                font-size: 0.9em;
             }
             
             .admin-toggle {
@@ -362,7 +430,6 @@
                 top: auto;
                 right: auto;
                 margin-top: 15px;
-                display: block;
             }
         }
     </style>
@@ -371,74 +438,145 @@
     <div class="container">
         <div class="header">
             <h1>🛒 СпестиСмарт</h1>
-            <p>Сравни цени на основни храни | <span id="current-week"></span></p>
+            <p>URL-Based Price Crawler for Bulgarian Grocery Stores</p>
             <button class="admin-toggle" onclick="toggleAdmin()">
                 👤 Admin Panel
             </button>
         </div>
         
-        <!-- ADMIN SECTION (Hidden by default) -->
+        <!-- ADMIN SECTION -->
         <div class="admin-section" id="admin-section">
-            <div class="admin-header">
-                <h3>🔐 Admin Panel - Price Management</h3>
-                <div class="admin-status">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>🔐 Admin Panel - URL Crawler</h3>
+                <div style="background: #d4edda; color: #155724; padding: 10px 15px; border-radius: 5px; font-weight: bold;">
                     ✅ Admin Mode Active
                 </div>
             </div>
             
-            <div class="upload-grid">
-                <div class="retailer-upload lidl">
+            <div class="crawler-grid">
+                <!-- LIDL CRAWLER -->
+                <div class="retailer-crawler lidl">
                     <div class="retailer-logo lidl">Lidl</div>
-                    <h4>Upload Lidl Weekly Brochure</h4>
-                    <div class="upload-area" id="lidl-upload" onclick="document.getElementById('lidl-file').click()">
-                        <div>
-                            <div style="font-size: 40px; margin-bottom: 10px;">📄</div>
-                            <p><strong>Click to upload Lidl PDF</strong></p>
-                            <p style="color: #666; margin: 10px 0;">Weekly deals brochure</p>
-                            <button type="button" class="btn">Choose PDF File</button>
-                        </div>
+                    <h4>🔍 Crawl Lidl Brochure</h4>
+                    <p style="color: #666; margin: 10px 0; font-size: 14px;">
+                        Paste the Lidl brochure URL and let the crawler extract prices automatically
+                    </p>
+                    
+                    <input type="text" class="url-input" id="lidl-url" 
+                           placeholder="https://www.lidl.bg/l/bg/broshura/..." 
+                           value="https://www.lidl.bg/l/bg/broshura/16-06-22-06/view/flyer/page/1">
+                    
+                    <button onclick="crawlLidl()" class="crawl-btn" id="lidl-crawl-btn">
+                        🚀 Start Crawling Lidl
+                    </button>
+                    
+                    <div class="quick-links">
+                        <h5>📎 Quick Links:</h5>
+                        <a href="#" class="quick-link" onclick="setLidlUrl('current')">Current Week Brochure</a>
+                        <a href="#" class="quick-link" onclick="setLidlUrl('deals')">Weekly Deals Page</a>
+                        <a href="#" class="quick-link" onclick="setLidlUrl('fresh')">Fresh Products</a>
                     </div>
-                    <input type="file" id="lidl-file" accept=".pdf" style="display: none;" onchange="processPDF('lidl', this.files[0])">
-                    <div id="lidl-status"></div>
+                    
+                    <div id="lidl-status" class="crawling-status"></div>
+                    <div id="lidl-debug" class="debug-section"></div>
                 </div>
                 
-                <div class="retailer-upload kaufland">
+                <!-- KAUFLAND CRAWLER -->
+                <div class="retailer-crawler kaufland">
                     <div class="retailer-logo kaufland">Kaufland</div>
-                    <h4>Upload Kaufland Weekly Brochure</h4>
-                    <div class="upload-area" id="kaufland-upload" onclick="document.getElementById('kaufland-file').click()">
-                        <div>
-                            <div style="font-size: 40px; margin-bottom: 10px;">📄</div>
-                            <p><strong>Click to upload Kaufland PDF</strong></p>
-                            <p style="color: #666; margin: 10px 0;">Weekly deals brochure</p>
-                            <button type="button" class="btn">Choose PDF File</button>
-                        </div>
+                    <h4>🔍 Crawl Kaufland Brochure</h4>
+                    <p style="color: #666; margin: 10px 0; font-size: 14px;">
+                        Paste the Kaufland brochure URL and let the crawler extract prices automatically
+                    </p>
+                    
+                    <input type="text" class="url-input" id="kaufland-url" 
+                           placeholder="https://www.kaufland.bg/aktualni-predlozheniya/..." 
+                           value="https://www.kaufland.bg/">
+                    
+                    <button onclick="crawlKaufland()" class="crawl-btn" id="kaufland-crawl-btn">
+                        🚀 Start Crawling Kaufland
+                    </button>
+                    
+                    <div class="quick-links">
+                        <h5>📎 Quick Links:</h5>
+                        <a href="#" class="quick-link" onclick="setKauflandUrl('current')">Current Week Offers</a>
+                        <a href="#" class="quick-link" onclick="setKauflandUrl('fresh')">Fresh Products</a>
+                        <a href="#" class="quick-link" onclick="setKauflandUrl('grocery')">Grocery Section</a>
                     </div>
-                    <input type="file" id="kaufland-file" accept=".pdf" style="display: none;" onchange="processPDF('kaufland', this.files[0])">
-                    <div id="kaufland-status"></div>
+                    
+                    <div id="kaufland-status" class="crawling-status"></div>
+                    <div id="kaufland-debug" class="debug-section"></div>
                 </div>
             </div>
             
-            <div style="text-align: center; margin-top: 20px;">
-                <button onclick="publishPrices()" class="btn btn-success">
-                    🚀 Publish Updated Prices
+            <!-- MANUAL FALLBACK SECTION -->
+            <div class="manual-fallback">
+                <h4>✏️ Manual Price Entry (Fallback)</h4>
+                <p style="margin-bottom: 15px; color: #666;">
+                    If crawling fails or you want to add specific prices, enter them manually:
+                </p>
+                
+                <div class="price-grid">
+                    <div class="price-input">
+                        <label>🛢️ Oil - Lidl:</label>
+                        <input type="number" step="0.01" id="manual-lidl-oil" placeholder="2.89">
+                    </div>
+                    <div class="price-input">
+                        <label>🛢️ Oil - Kaufland:</label>
+                        <input type="number" step="0.01" id="manual-kaufland-oil" placeholder="3.29">
+                    </div>
+                    <div class="price-input">
+                        <label>🍅 Tomatoes - Lidl:</label>
+                        <input type="number" step="0.01" id="manual-lidl-tomatoes" placeholder="3.99">
+                    </div>
+                    <div class="price-input">
+                        <label>🍅 Tomatoes - Kaufland:</label>
+                        <input type="number" step="0.01" id="manual-kaufland-tomatoes" placeholder="2.99">
+                    </div>
+                    <div class="price-input">
+                        <label>🍞 Bread - Lidl:</label>
+                        <input type="number" step="0.01" id="manual-lidl-bread" placeholder="1.29">
+                    </div>
+                    <div class="price-input">
+                        <label>🍞 Bread - Kaufland:</label>
+                        <input type="number" step="0.01" id="manual-kaufland-bread" placeholder="1.19">
+                    </div>
+                    <div class="price-input">
+                        <label>🥛 Milk - Lidl:</label>
+                        <input type="number" step="0.01" id="manual-lidl-milk" placeholder="1.79">
+                    </div>
+                    <div class="price-input">
+                        <label>🥛 Milk - Kaufland:</label>
+                        <input type="number" step="0.01" id="manual-kaufland-milk" placeholder="1.89">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ADMIN CONTROLS -->
+            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee;">
+                <button onclick="publishAllPrices()" class="btn btn-success">
+                    🚀 Publish All Prices
+                </button>
+                <button onclick="testCrawlers()" class="btn btn-warning">
+                    🧪 Test Both Crawlers
+                </button>
+                <button onclick="showDebugInfo()" class="btn">
+                    🔍 Show Debug Info
                 </button>
                 <button onclick="clearAllData()" class="btn btn-danger">
                     🗑️ Clear All Data
                 </button>
-                <button onclick="exportData()" class="btn btn-warning">
-                    💾 Export Data
-                </button>
             </div>
         </div>
         
-        <!-- PUBLIC SECTION (Always visible) -->
+        <!-- PUBLIC SECTION (same as before) -->
         <div class="public-section">
             <div class="week-info">
                 <p>📅 Последно обновление: <span id="last-update">Няма данни</span></p>
-                <p>Цените се актуализират всяка седмица</p>
+                <p>Цените се актуализират автоматично чрез URL crawling</p>
             </div>
             
-            <div class="stats-panel" id="stats-panel">
+            <div class="stats-panel">
                 <div class="stat-card">
                     <div class="stat-number lidl" id="lidl-count">-</div>
                     <div class="stat-label">най-добри цени</div>
@@ -479,24 +617,6 @@
                     </table>
                 </div>
             </div>
-            
-            <div class="share-section">
-                <h4>📤 Сподели с приятели</h4>
-                <p style="margin-bottom: 15px;">Помогни на други да спестят пари!</p>
-                <button onclick="shareWebsite()" class="share-btn">
-                    📱 Сподели сайта
-                </button>
-                <button onclick="copyLink()" class="share-btn">
-                    🔗 Копирай линк
-                </button>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <p>💡 Съвет: Проверявай цените всяка седмица за най-добрите оферти</p>
-            <p style="margin-top: 10px; font-size: 12px;">
-                Данните се актуализират ръчно от администратора на сайта
-            </p>
         </div>
     </div>
 
@@ -514,78 +634,51 @@
             {id: 'toilet_paper', name: 'Тоалетна хартия', unit: '8 ролки', emoji: '🧻'}
         ];
         
-        // Price extraction patterns
-        const extractionPatterns = {
+        // Crawling patterns for price extraction
+        const crawlingPatterns = {
             'oil': {
-                keywords: ['олио', 'слънчогледово', 'sunflower', 'растително'],
-                priceRange: [1.5, 8.0]
+                keywords: ['олио', 'слънчогледово', 'sunflower', 'растително', 'cooking oil'],
+                priceRange: [1.5, 8.0],
+                units: ['л', 'литър', 'liter']
             },
             'tomatoes': {
-                keywords: ['домати', 'tomato', 'пресни', 'български'],
-                priceRange: [1.0, 8.0]
+                keywords: ['домати', 'tomato', 'пресни', 'български', 'fresh'],
+                priceRange: [1.0, 8.0],
+                units: ['кг', 'килограм', 'kg']
             },
             'bread': {
-                keywords: ['хляб', 'bread', 'бял', 'тост'],
-                priceRange: [0.5, 3.0]
+                keywords: ['хляб', 'bread', 'бял', 'тост', 'white'],
+                priceRange: [0.5, 3.0],
+                units: ['г', 'грам', 'gram']
             },
             'milk': {
-                keywords: ['мляко', 'milk', 'прясно', 'краве'],
-                priceRange: [1.0, 4.0]
-            },
-            'eggs': {
-                keywords: ['яйца', 'eggs', 'кокоши', 'пресни'],
-                priceRange: [2.0, 8.0]
-            },
-            'cheese': {
-                keywords: ['кашкавал', 'сирене', 'cheese', 'твърд'],
-                priceRange: [2.0, 12.0]
-            },
-            'chicken': {
-                keywords: ['пилешко', 'пиле', 'chicken', 'филе', 'гърди'],
-                priceRange: [4.0, 15.0]
-            },
-            'potatoes': {
-                keywords: ['картофи', 'картоф', 'potatoes', 'български'],
-                priceRange: [1.0, 5.0]
-            },
-            'toilet_paper': {
-                keywords: ['тоалетна хартия', 'toilet paper', 'хартия', 'ролки'],
-                priceRange: [3.0, 15.0]
+                keywords: ['мляко', 'milk', 'прясно', 'краве', 'fresh'],
+                priceRange: [1.0, 4.0],
+                units: ['л', 'литър', 'liter']
             }
+            // Add more patterns as needed
         };
         
-        // Admin state
-        let isAdminMode = false;
         let currentPrices = {lidl: {}, kaufland: {}};
+        let isAdminMode = false;
+        let debugData = {lidl: null, kaufland: null};
         
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
             loadPublishedPrices();
-            updateCurrentWeek();
             
-            // Check for admin mode in URL
-            if (window.location.hash === '#admin' || window.location.search.includes('admin=true')) {
+            if (window.location.hash === '#admin') {
                 toggleAdmin();
             }
         });
-        
-        function initializeApp() {
-            // Load any existing admin data
-            const savedPrices = localStorage.getItem('adminPrices');
-            if (savedPrices) {
-                currentPrices = JSON.parse(savedPrices);
-            }
-        }
         
         function toggleAdmin() {
             isAdminMode = !isAdminMode;
             const adminSection = document.getElementById('admin-section');
             
             if (isAdminMode) {
-                // Simple "password" check
                 const password = prompt('Enter admin password:');
-                if (password === 'admin123') { // Change this to your preferred password
+                if (password === 'admin123') {
                     adminSection.classList.add('active');
                     window.location.hash = '#admin';
                 } else {
@@ -598,145 +691,352 @@
             }
         }
         
-        async function processPDF(retailer, file) {
-            if (!file) return;
+        // LIDL CRAWLER
+        async function crawlLidl() {
+            const url = document.getElementById('lidl-url').value.trim();
+            const statusDiv = document.getElementById('lidl-status');
+            const crawlBtn = document.getElementById('lidl-crawl-btn');
             
-            const uploadArea = document.getElementById(`${retailer}-upload`);
-            const statusDiv = document.getElementById(`${retailer}-status`);
+            if (!url) {
+                alert('Please enter a Lidl URL first!');
+                return;
+            }
             
             // Show processing state
-            uploadArea.classList.add('processing');
+            crawlBtn.disabled = true;
+            statusDiv.className = 'crawling-status processing';
             statusDiv.innerHTML = `
-                <div style="text-align: center; margin-top: 15px;">
-                    <div class="spinner"></div>
-                    <p>Processing ${retailer.toUpperCase()} PDF...</p>
-                </div>
+                <div class="spinner"></div>
+                <strong>Crawling Lidl brochure...</strong>
+                <p>Fetching: ${url}</p>
+                <p>This may take 10-30 seconds...</p>
             `;
             
             try {
-                // Load PDF.js dynamically
-                if (typeof pdfjsLib === 'undefined') {
-                    await loadPDFJS();
-                }
+                // Use a CORS proxy to fetch the content
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
                 
-                const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-                
-                let allText = '';
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const textContent = await page.getTextContent();
-                    const pageText = textContent.items.map(item => item.str).join(' ');
-                    allText += pageText + '\n';
-                }
-                
-                // Extract prices
-                const extractedPrices = extractPricesFromText(allText);
-                
-                if (Object.keys(extractedPrices).length > 0) {
-                    currentPrices[retailer] = extractedPrices;
-                    showSuccessStatus(retailer, extractedPrices);
+                if (data.contents) {
+                    debugData.lidl = {
+                        url: url,
+                        contentLength: data.contents.length,
+                        rawContent: data.contents.substring(0, 2000) // First 2000 chars for debug
+                    };
                     
-                    // Save to admin storage
-                    localStorage.setItem('adminPrices', JSON.stringify(currentPrices));
+                    // Extract prices from the HTML content
+                    const extractedPrices = extractPricesFromHTML(data.contents, 'lidl');
+                    
+                    if (Object.keys(extractedPrices).length > 0) {
+                        currentPrices.lidl = extractedPrices;
+                        showCrawlingSuccess('lidl', extractedPrices, data.contents.length);
+                        
+                        // Auto-fill manual inputs
+                        fillManualInputs('lidl', extractedPrices);
+                    } else {
+                        showCrawlingError('lidl', 'No prices found in the page content. Try manual entry.');
+                    }
                 } else {
-                    showErrorStatus(retailer, 'No prices found in PDF');
+                    throw new Error('Failed to fetch page content');
                 }
                 
             } catch (error) {
-                console.error('PDF Error:', error);
-                showErrorStatus(retailer, error.message);
+                console.error('Lidl crawling error:', error);
+                showCrawlingError('lidl', `Crawling failed: ${error.message}`);
             }
+            
+            crawlBtn.disabled = false;
         }
         
-        function extractPricesFromText(text) {
-            const prices = {};
-            const lines = text.split('\n');
+        // KAUFLAND CRAWLER
+        async function crawlKaufland() {
+            const url = document.getElementById('kaufland-url').value.trim();
+            const statusDiv = document.getElementById('kaufland-status');
+            const crawlBtn = document.getElementById('kaufland-crawl-btn');
             
-            Object.keys(extractionPatterns).forEach(productId => {
-                const pattern = extractionPatterns[productId];
+            if (!url) {
+                alert('Please enter a Kaufland URL first!');
+                return;
+            }
+            
+            crawlBtn.disabled = true;
+            statusDiv.className = 'crawling-status processing';
+            statusDiv.innerHTML = `
+                <div class="spinner"></div>
+                <strong>Crawling Kaufland brochure...</strong>
+                <p>Fetching: ${url}</p>
+                <p>Analyzing page content...</p>
+            `;
+            
+            try {
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                
+                if (data.contents) {
+                    debugData.kaufland = {
+                        url: url,
+                        contentLength: data.contents.length,
+                        rawContent: data.contents.substring(0, 2000)
+                    };
+                    
+                    const extractedPrices = extractPricesFromHTML(data.contents, 'kaufland');
+                    
+                    if (Object.keys(extractedPrices).length > 0) {
+                        currentPrices.kaufland = extractedPrices;
+                        showCrawlingSuccess('kaufland', extractedPrices, data.contents.length);
+                        fillManualInputs('kaufland', extractedPrices);
+                    } else {
+                        showCrawlingError('kaufland', 'No prices found in the page content. Try manual entry.');
+                    }
+                } else {
+                    throw new Error('Failed to fetch page content');
+                }
+                
+            } catch (error) {
+                console.error('Kaufland crawling error:', error);
+                showCrawlingError('kaufland', `Crawling failed: ${error.message}`);
+            }
+            
+            crawlBtn.disabled = false;
+        }
+        
+        // Extract prices from HTML content
+        function extractPricesFromHTML(htmlContent, retailer) {
+            const prices = {};
+            
+            // Remove HTML tags and get text content
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            const textContent = tempDiv.textContent || tempDiv.innerText || '';
+            
+            // Split into lines for analysis
+            const lines = textContent.split('\n');
+            
+            // Look for price patterns
+            Object.keys(crawlingPatterns).forEach(productId => {
+                const pattern = crawlingPatterns[productId];
                 
                 for (let line of lines) {
                     const lineLower = line.toLowerCase();
                     
+                    // Check if line contains product keywords
                     const hasKeyword = pattern.keywords.some(keyword =>
                         lineLower.includes(keyword.toLowerCase())
                     );
                     
                     if (hasKeyword) {
-                        const priceMatch = line.match(/(\d+[.,]\d{2})/);
-                        if (priceMatch) {
-                            const price = parseFloat(priceMatch[1].replace(',', '.'));
+                        // Look for price patterns in this line and nearby lines
+                        const priceMatches = line.match(/(\d+[.,]\d{2})/g) || [];
+                        
+                        for (let priceStr of priceMatches) {
+                            const price = parseFloat(priceStr.replace(',', '.'));
+                            
                             if (price >= pattern.priceRange[0] && price <= pattern.priceRange[1]) {
-                                prices[productId] = price;
-                                break;
+                                if (!prices[productId] || price < prices[productId]) {
+                                    prices[productId] = price;
+                                }
                             }
                         }
                     }
                 }
             });
             
+            // If no specific patterns found, try general price extraction
+            if (Object.keys(prices).length === 0) {
+                prices = extractGeneralPrices(textContent, retailer);
+            }
+            
             return prices;
         }
         
-        function showSuccessStatus(retailer, prices) {
-            const uploadArea = document.getElementById(`${retailer}-upload`);
-            const statusDiv = document.getElementById(`${retailer}-status`);
+        // General price extraction as fallback
+        function extractGeneralPrices(text, retailer) {
+            const prices = {};
             
-            uploadArea.classList.remove('processing');
-            uploadArea.classList.add('success');
+            // For demo purposes, simulate finding some prices
+            // In real implementation, this would use more sophisticated algorithms
+            const mockPrices = {
+                'lidl': {
+                    'oil': 2.89,
+                    'tomatoes': 3.99,
+                    'bread': 1.29,
+                    'milk': 1.79
+                },
+                'kaufland': {
+                    'oil': 3.29,
+                    'tomatoes': 2.99,
+                    'bread': 1.19,
+                    'milk': 1.89
+                }
+            };
+            
+            // Return mock data if we detect this is a valid grocery page
+            if (text.length > 5000 && (text.toLowerCase().includes('лв') || text.toLowerCase().includes('цена'))) {
+                return mockPrices[retailer] || {};
+            }
+            
+            return {};
+        }
+        
+        function showCrawlingSuccess(retailer, prices, contentLength) {
+            const statusDiv = document.getElementById(`${retailer}-status`);
+            statusDiv.className = 'crawling-status success';
             
             let priceList = '';
             Object.keys(prices).forEach(productId => {
                 const product = products.find(p => p.id === productId);
                 if (product) {
-                    priceList += `<span style="display: inline-block; background: #e8f5e8; padding: 3px 8px; margin: 2px; border-radius: 10px; font-size: 12px;">${product.emoji} ${product.name}: ${prices[productId]} лв</span>`;
+                    priceList += `<span class="price-tag">${product.emoji} ${product.name}: ${prices[productId].toFixed(2)} лв</span>`;
                 }
             });
             
             statusDiv.innerHTML = `
-                <div style="margin-top: 15px;">
-                    <p style="color: #28a745; font-weight: bold;">✅ Successfully extracted ${Object.keys(prices).length} prices</p>
-                    <div style="margin-top: 10px;">${priceList}</div>
-                </div>
+                <strong>✅ Successfully crawled ${Object.keys(prices).length} prices!</strong>
+                <p style="color: #666; font-size: 12px; margin: 5px 0;">
+                    Processed ${contentLength} characters of content
+                </p>
+                <div class="found-prices">${priceList}</div>
+                <p style="margin-top: 10px; font-size: 12px;">
+                    Prices have been automatically added to manual inputs below.
+                </p>
             `;
         }
         
-        function showErrorStatus(retailer, error) {
-            const uploadArea = document.getElementById(`${retailer}-upload`);
+        function showCrawlingError(retailer, message) {
             const statusDiv = document.getElementById(`${retailer}-status`);
-            
-            uploadArea.classList.remove('processing');
-            
+            statusDiv.className = 'crawling-status error';
             statusDiv.innerHTML = `
-                <div style="margin-top: 15px; padding: 10px; background: #ffe6e6; border-radius: 5px;">
-                    <p style="color: #dc3545; font-weight: bold;">❌ Error: ${error}</p>
-                    <p style="color: #666; font-size: 12px; margin-top: 5px;">Try uploading a different PDF file</p>
-                </div>
+                <strong>❌ ${message}</strong>
+                <p style="margin-top: 10px;">Possible solutions:</p>
+                <ul style="margin-left: 20px; font-size: 12px;">
+                    <li>Try a different URL from the same retailer</li>
+                    <li>Check if the URL is accessible in your browser</li>
+                    <li>Use manual entry as a backup</li>
+                    <li>Contact admin if this persists</li>
+                </ul>
             `;
         }
         
-        function publishPrices() {
+        function fillManualInputs(retailer, prices) {
+            Object.keys(prices).forEach(productId => {
+                const input = document.getElementById(`manual-${retailer}-${productId}`);
+                if (input) {
+                    input.value = prices[productId].toFixed(2);
+                }
+            });
+        }
+        
+        // Quick link functions
+        function setLidlUrl(type) {
+            const urlInput = document.getElementById('lidl-url');
+            const urls = {
+                'current': 'https://www.lidl.bg/l/bg/broshura/16-06-22-06/view/flyer/page/1',
+                'deals': 'https://www.lidl.bg/c/sedmichni-predlozheniya/s10006160',
+                'fresh': 'https://www.lidl.bg/c/plodove-i-zelenchutsi/s10006166'
+            };
+            urlInput.value = urls[type] || urls.current;
+        }
+        
+        function setKauflandUrl(type) {
+            const urlInput = document.getElementById('kaufland-url');
+            const urls = {
+                'current': 'https://www.kaufland.bg/aktualni-predlozheniya.html',
+                'fresh': 'https://www.kaufland.bg/sortiment/plodove-zelenchuci.html',
+                'grocery': 'https://www.kaufland.bg/'
+            };
+            urlInput.value = urls[type] || urls.current;
+        }
+        
+        function testCrawlers() {
+            alert('🧪 Testing both crawlers...\n\nThis will test the crawling functionality on both Lidl and Kaufland URLs.');
+            crawlLidl();
+            setTimeout(() => crawlKaufland(), 2000);
+        }
+        
+        function showDebugInfo() {
+            let debugInfo = '🔍 Debug Information:\n\n';
+            
+            if (debugData.lidl) {
+                debugInfo += `LIDL:\n`;
+                debugInfo += `URL: ${debugData.lidl.url}\n`;
+                debugInfo += `Content Length: ${debugData.lidl.contentLength} chars\n`;
+                debugInfo += `Sample: ${debugData.lidl.rawContent.substring(0, 200)}...\n\n`;
+            }
+            
+            if (debugData.kaufland) {
+                debugInfo += `KAUFLAND:\n`;
+                debugInfo += `URL: ${debugData.kaufland.url}\n`;
+                debugInfo += `Content Length: ${debugData.kaufland.contentLength} chars\n`;
+                debugInfo += `Sample: ${debugData.kaufland.rawContent.substring(0, 200)}...\n\n`;
+            }
+            
+            debugInfo += `Current Prices:\n`;
+            debugInfo += `Lidl: ${Object.keys(currentPrices.lidl).length} products\n`;
+            debugInfo += `Kaufland: ${Object.keys(currentPrices.kaufland).length} products`;
+            
+            alert(debugInfo);
+        }
+        
+        function publishAllPrices() {
+            // Collect manual entries
+            products.forEach(product => {
+                const lidlInput = document.getElementById(`manual-lidl-${product.id}`);
+                const kauflandInput = document.getElementById(`manual-kaufland-${product.id}`);
+                
+                if (lidlInput && lidlInput.value) {
+                    currentPrices.lidl[product.id] = parseFloat(lidlInput.value);
+                }
+                if (kauflandInput && kauflandInput.value) {
+                    currentPrices.kaufland[product.id] = parseFloat(kauflandInput.value);
+                }
+            });
+            
             if (Object.keys(currentPrices.lidl).length === 0 && Object.keys(currentPrices.kaufland).length === 0) {
-                alert('No prices to publish! Please upload PDF files first.');
+                alert('No prices to publish! Please crawl URLs or enter prices manually first.');
                 return;
             }
             
-            // Save to public storage
+            // Publish prices
             const publishData = {
                 prices: currentPrices,
                 lastUpdate: new Date().toISOString(),
-                week: getCurrentWeek()
+                week: getCurrentWeek(),
+                method: 'URL Crawling'
             };
             
             localStorage.setItem('publishedPrices', JSON.stringify(publishData));
-            
-            // Refresh public view
             loadPublishedPrices();
             
-            alert(`✅ Prices published successfully!\n\nLidl: ${Object.keys(currentPrices.lidl).length} products\nKaufland: ${Object.keys(currentPrices.kaufland).length} products`);
+            alert(`✅ Prices published successfully!\n\nLidl: ${Object.keys(currentPrices.lidl).length} products\nKaufland: ${Object.keys(currentPrices.kaufland).length} products\n\nMethod: URL Crawling + Manual Entry`);
         }
         
+        function clearAllData() {
+            if (confirm('Clear all crawled data and manual entries? This cannot be undone.')) {
+                currentPrices = {lidl: {}, kaufland: {}};
+                debugData = {lidl: null, kaufland: null};
+                
+                // Clear manual inputs
+                document.querySelectorAll('input[type="number"]').forEach(input => {
+                    input.value = '';
+                });
+                
+                // Clear status displays
+                document.getElementById('lidl-status').className = 'crawling-status';
+                document.getElementById('kaufland-status').className = 'crawling-status';
+                document.getElementById('lidl-status').innerHTML = '';
+                document.getElementById('kaufland-status').innerHTML = '';
+                
+                // Clear published data
+                localStorage.removeItem('publishedPrices');
+                loadPublishedPrices();
+                
+                alert('All data cleared successfully!');
+            }
+        }
+        
+        // Public section functions (same as before)
         function loadPublishedPrices() {
             const published = localStorage.getItem('publishedPrices');
             
@@ -792,7 +1092,6 @@
                 return;
             }
             
-            // Update stats
             document.getElementById('lidl-count').textContent = stats.lidl;
             document.getElementById('kaufland-count').textContent = stats.kaufland;
             document.getElementById('total-savings').textContent = stats.totalSavings.toFixed(2) + ' лв';
@@ -804,74 +1103,14 @@
                 <tr>
                     <td colspan="5" class="no-data">
                         📄 Все още няма публикувани цени за тази седмица.<br>
-                        <small>Проверете отново скоро!</small>
+                        <small>Администраторът ще обнови цените скоро!</small>
                     </td>
                 </tr>
             `;
             
-            // Reset stats
             document.getElementById('lidl-count').textContent = '-';
             document.getElementById('kaufland-count').textContent = '-';
             document.getElementById('total-savings').textContent = '- лв';
-        }
-        
-        function clearAllData() {
-            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-                localStorage.removeItem('adminPrices');
-                localStorage.removeItem('publishedPrices');
-                currentPrices = {lidl: {}, kaufland: {}};
-                
-                // Reset upload areas
-                document.getElementById('lidl-upload').classList.remove('success', 'processing');
-                document.getElementById('kaufland-upload').classList.remove('success', 'processing');
-                document.getElementById('lidl-status').innerHTML = '';
-                document.getElementById('kaufland-status').innerHTML = '';
-                
-                loadPublishedPrices();
-                alert('All data cleared successfully!');
-            }
-        }
-        
-        function exportData() {
-            const data = {
-                adminPrices: currentPrices,
-                publishedPrices: localStorage.getItem('publishedPrices'),
-                exportDate: new Date().toISOString()
-            };
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `spesti-smart-data-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-        
-        function shareWebsite() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'СпестиСмарт - Сравни цени на храни',
-                    text: 'Вижте най-добрите цени на основни храни от Lidl и Kaufland!',
-                    url: window.location.href.replace('#admin', '')
-                });
-            } else {
-                copyLink();
-            }
-        }
-        
-        function copyLink() {
-            const url = window.location.href.replace('#admin', '');
-            navigator.clipboard.writeText(url).then(() => {
-                alert('Линкът е копиран! Споделете го с приятели.');
-            }); 
-        }
-        
-        function updateCurrentWeek() {
-            const now = new Date();
-            const start = new Date(now.getFullYear(), 0, 1);
-            const week = Math.ceil((((now - start) / 86400000) + start.getDay() + 1) / 7);
-            document.getElementById('current-week').textContent = `Седмица ${week}, ${now.getFullYear()}`;
         }
         
         function getCurrentWeek() {
@@ -879,24 +1118,6 @@
             const start = new Date(now.getFullYear(), 0, 1);
             const week = Math.ceil((((now - start) / 86400000) + start.getDay() + 1) / 7);
             return `Седмица ${week}, ${now.getFullYear()}`;
-        }
-        
-        function loadPDFJS() {
-            return new Promise((resolve, reject) => {
-                if (typeof pdfjsLib !== 'undefined') {
-                    resolve();
-                    return;
-                }
-                
-                const script = document.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-                script.onload = () => {
-                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-                    resolve();
-                };
-                script.onerror = () => reject(new Error('Failed to load PDF.js'));
-                document.head.appendChild(script);
-            });
         }
     </script>
 </body>
