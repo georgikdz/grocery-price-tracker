@@ -1,1 +1,1 @@
-# price-comparison-frontend
+# grocery-price-tracker
