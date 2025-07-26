@@ -44,6 +44,28 @@
             opacity: 0.9;
         }
         
+        .update-section {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .update-btn {
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        
+        .update-btn:hover {
+            background: #218838;
+        }
+        
         .stats-panel {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -66,9 +88,19 @@
             margin-bottom: 5px;
         }
         
+        .stat-label {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .stat-store {
+            font-weight: bold;
+        }
+        
         .lidl { color: #0050AA; }
         .billa { color: #E31E24; }
         .kaufland { color: #FFD500; }
+        .savings { color: #28a745; }
         
         .price-table {
             padding: 30px;
@@ -109,7 +141,11 @@
             color: #155724;
         }
         
-        .savings {
+        .price-cell {
+            font-weight: bold;
+        }
+        
+        .savings-cell {
             color: #28a745;
             font-weight: bold;
         }
@@ -119,6 +155,19 @@
             padding: 20px;
             background: #e9ecef;
             color: #6c757d;
+        }
+        
+        .edit-mode {
+            background: #fff3cd !important;
+            border: 2px solid #ffc107;
+        }
+        
+        .editable {
+            background: none;
+            border: none;
+            font-weight: bold;
+            width: 80px;
+            text-align: center;
         }
         
         @media (max-width: 768px) {
@@ -146,25 +195,40 @@
     <div class="container">
         <div class="header">
             <h1>🛒 СпестиСмарт</h1>
-            <p>Сравни цени на основни храни | Седмица 16-22 Юни 2025</p>
+            <p>Сравни цени на основни храни | <span id="currentWeek"></span></p>
         </div>
         
-        <div class="stats-panel">
+        <div class="update-section">
+            <h3>📝 Актуализирай цени</h3>
+            <p>Кликни "Редактирай цени" за да въведеш новите цени от брошурите</p>
+            <button class="update-btn" onclick="toggleEditMode()" id="editBtn">
+                Редактирай цени
+            </button>
+            <button class="update-btn" onclick="saveChanges()" id="saveBtn" style="display: none;">
+                Запази промените
+            </button>
+        </div>
+        
+        <div class="stats-panel" id="stats-panel">
             <div class="stat-card">
-                <div class="stat-number lidl">4</div>
-                <div>Най-добри цени<br><strong>Lidl</strong></div>
+                <div class="stat-number lidl" id="lidl-count">4</div>
+                <div class="stat-label">най-добри цени</div>
+                <div class="stat-store lidl">Lidl</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number billa">3</div>
-                <div>Най-добри цени<br><strong>BILLA</strong></div>
+                <div class="stat-number billa" id="billa-count">3</div>
+                <div class="stat-label">най-добри цени</div>
+                <div class="stat-store billa">BILLA</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number kaufland">1</div>
-                <div>Най-добри цени<br><strong>Kaufland</strong></div>
+                <div class="stat-number kaufland" id="kaufland-count">1</div>
+                <div class="stat-label">най-добри цени</div>
+                <div class="stat-store kaufland">Kaufland</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number savings">3.30 лв</div>
-                <div>Общо спестени<br><strong>от списъка</strong></div>
+                <div class="stat-number savings" id="total-savings">3.30 лв</div>
+                <div class="stat-label">Общо спестени</div>
+                <div class="stat-store">от списъка</div>
             </div>
         </div>
         
@@ -190,72 +254,154 @@
         </div>
         
         <div class="update-info">
-            <p>📅 Последно обновление: <span id="lastUpdate">16 Юни 2025</span></p>
-            <p>Данните се обновяват всяка седмица в понеделник</p>
+            <p>📅 Последно обновление: <span id="lastUpdate"></span></p>
+            <p>💡 Съвет: Проверявай цените всяка седмица в понеделник</p>
         </div>
     </div>
 
     <script>
-        // Replace YOUR_SHEET_ID with your actual Google Sheets ID
-        const SHEET_ID = 'YOUR_SHEET_ID_HERE';
-        const SHEET_NAME = 'Current Prices';
-        const API_KEY = 'YOUR_API_KEY'; // We'll use CSV export instead
-        
-        // Sample data (replace with Google Sheets data)
-        const sampleData = [
-            ['Слънчогледово олио', '1л', '🛢️', '2.89', '3.45', '3.29', 'Lidl', '0.40'],
-            ['Домати', '1кг', '🍅', '3.99', '2.49', '2.99', 'BILLA', '0.50'],
-            ['Хляб бял', '500г', '🍞', '1.29', '0.99', '1.19', 'BILLA', '0.20'],
-            ['Прясно мляко', '1л', '🥛', '1.79', '1.99', '1.89', 'Lidl', '0.10'],
-            ['Яйца', '10бр', '🥚', '4.49', '4.29', '3.99', 'Kaufland', '0.30'],
-            ['Кашкавал', '200г', '🧀', '3.99', '4.69', '4.29', 'Lidl', '0.30'],
-            ['Пилешко филе', '1кг', '🍗', '8.99', '7.49', '8.29', 'BILLA', '0.80'],
-            ['Картофи', '2кг', '🥔', '2.99', '3.49', '3.19', 'Lidl', '0.20'],
-            ['Тоалетна хартия', '8 ролки', '🧻', '8.99', '7.99', '8.49', 'BILLA', '0.50']
+        // Initial product data - you'll update these weekly
+        let groceryData = [
+            {name: 'Слънчогледово олио', unit: '1л', emoji: '🛢️', lidl: 2.89, billa: 3.45, kaufland: 3.29},
+            {name: 'Домати', unit: '1кг', emoji: '🍅', lidl: 3.99, billa: 2.49, kaufland: 2.99},
+            {name: 'Хляб бял', unit: '500г', emoji: '🍞', lidl: 1.29, billa: 0.99, kaufland: 1.19},
+            {name: 'Прясно мляко', unit: '1л', emoji: '🥛', lidl: 1.79, billa: 1.99, kaufland: 1.89},
+            {name: 'Яйца', unit: '10бр', emoji: '🥚', lidl: 4.49, billa: 4.29, kaufland: 3.99},
+            {name: 'Кашкавал', unit: '200г', emoji: '🧀', lidl: 3.99, billa: 4.69, kaufland: 4.29},
+            {name: 'Пилешко филе', unit: '1кг', emoji: '🍗', lidl: 8.99, billa: 7.49, kaufland: 8.29},
+            {name: 'Картофи', unit: '2кг', emoji: '🥔', lidl: 2.99, billa: 3.49, kaufland: 3.19},
+            {name: 'Тоалетна хартия', unit: '8 ролки', emoji: '🧻', lidl: 8.99, billa: 7.99, kaufland: 8.49}
         ];
+        
+        let editMode = false;
         
         function loadPriceData() {
             const tbody = document.getElementById('priceTableBody');
             tbody.innerHTML = '';
             
-            sampleData.forEach(row => {
-                const tr = document.createElement('tr');
-                const bestStore = row[6];
+            let stats = {lidl: 0, billa: 0, kaufland: 0, totalSavings: 0};
+            
+            groceryData.forEach((product, index) => {
+                const prices = [
+                    {store: 'lidl', price: product.lidl},
+                    {store: 'billa', price: product.billa},
+                    {store: 'kaufland', price: product.kaufland}
+                ];
                 
+                const bestPrice = Math.min(...prices.map(p => p.price));
+                const bestStore = prices.find(p => p.price === bestPrice).store;
+                const maxPrice = Math.max(...prices.map(p => p.price));
+                const savings = (maxPrice - bestPrice).toFixed(2);
+                
+                stats[bestStore]++;
+                stats.totalSavings += parseFloat(savings);
+                
+                const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${row[2]} <strong>${row[0]}</strong> (${row[1]})</td>
-                    <td class="${bestStore === 'Lidl' ? 'best-price' : ''}">${row[3]} лв</td>
-                    <td class="${bestStore === 'BILLA' ? 'best-price' : ''}">${row[4]} лв</td>
-                    <td class="${bestStore === 'Kaufland' ? 'best-price' : ''}">${row[5]} лв</td>
-                    <td class="best-price">💰 ${bestStore}</td>
-                    <td class="savings">${row[7]} лв</td>
+                    <td>${product.emoji} <strong>${product.name}</strong> (${product.unit})</td>
+                    <td class="price-cell ${bestStore === 'lidl' ? 'best-price' : ''}">
+                        <input type="number" step="0.01" value="${product.lidl}" 
+                               class="editable" id="lidl-${index}" 
+                               ${editMode ? '' : 'readonly'} 
+                               onchange="updatePrice(${index}, 'lidl', this.value)"> лв
+                    </td>
+                    <td class="price-cell ${bestStore === 'billa' ? 'best-price' : ''}">
+                        <input type="number" step="0.01" value="${product.billa}" 
+                               class="editable" id="billa-${index}" 
+                               ${editMode ? '' : 'readonly'}
+                               onchange="updatePrice(${index}, 'billa', this.value)"> лв
+                    </td>
+                    <td class="price-cell ${bestStore === 'kaufland' ? 'best-price' : ''}">
+                        <input type="number" step="0.01" value="${product.kaufland}" 
+                               class="editable" id="kaufland-${index}" 
+                               ${editMode ? '' : 'readonly'}
+                               onchange="updatePrice(${index}, 'kaufland', this.value)"> лв
+                    </td>
+                    <td class="best-price">💰 ${bestStore.toUpperCase()}</td>
+                    <td class="savings-cell">${savings} лв</td>
                 `;
                 
                 tbody.appendChild(tr);
             });
+            
+            // Update stats
+            document.getElementById('lidl-count').textContent = stats.lidl;
+            document.getElementById('billa-count').textContent = stats.billa;
+            document.getElementById('kaufland-count').textContent = stats.kaufland;
+            document.getElementById('total-savings').textContent = stats.totalSavings.toFixed(2) + ' лв';
+        }
+        
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editBtn = document.getElementById('editBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const inputs = document.querySelectorAll('.editable');
+            
+            if (editMode) {
+                editBtn.style.display = 'none';
+                saveBtn.style.display = 'inline-block';
+                inputs.forEach(input => {
+                    input.removeAttribute('readonly');
+                    input.parentElement.classList.add('edit-mode');
+                });
+            } else {
+                editBtn.style.display = 'inline-block';
+                saveBtn.style.display = 'none';
+                inputs.forEach(input => {
+                    input.setAttribute('readonly', true);
+                    input.parentElement.classList.remove('edit-mode');
+                });
+            }
+        }
+        
+        function updatePrice(index, store, value) {
+            groceryData[index][store] = parseFloat(value);
+            // Auto-refresh the table to update best prices
+            setTimeout(() => {
+                loadPriceData();
+                toggleEditMode(); // Re-enable edit mode
+                toggleEditMode();
+            }, 100);
+        }
+        
+        function saveChanges() {
+            // Save to localStorage for persistence
+            localStorage.setItem('groceryData', JSON.stringify(groceryData));
+            localStorage.setItem('lastUpdate', new Date().toLocaleDateString('bg-BG'));
+            
+            toggleEditMode();
+            loadPriceData();
+            alert('Цените са запазени успешно! 🎉');
+        }
+        
+        function loadSavedData() {
+            const saved = localStorage.getItem('groceryData');
+            const lastUpdate = localStorage.getItem('lastUpdate');
+            
+            if (saved) {
+                groceryData = JSON.parse(saved);
+            }
+            
+            if (lastUpdate) {
+                document.getElementById('lastUpdate').textContent = lastUpdate;
+            } else {
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString('bg-BG');
+            }
+        }
+        
+        function getCurrentWeek() {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 1);
+            const week = Math.ceil((((now - start) / 86400000) + start.getDay() + 1) / 7);
+            return `Седмица ${week}, ${now.getFullYear()}`;
         }
         
         // Load data when page loads
-        document.addEventListener('DOMContentLoaded', loadPriceData);
-        
-        // Function to load data from Google Sheets (for later use)
-        async function loadFromGoogleSheets() {
-            try {
-                // Use CSV export URL (no API key needed)
-                const response = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`);
-                const csvText = await response.text();
-                
-                // Parse CSV and update table
-                const rows = csvText.split('\n').slice(1); // Skip header
-                const data = rows.map(row => row.split(','));
-                
-                // Update table with real data
-                updateTable(data);
-            } catch (error) {
-                console.log('Using sample data');
-                loadPriceData();
-            }
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedData();
+            loadPriceData();
+            document.getElementById('currentWeek').textContent = getCurrentWeek();
+        });
     </script>
 </body>
 </html>
