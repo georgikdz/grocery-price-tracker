@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>СпестиСмарт - Сравни цени на храни</title>
-    <meta name="description" content="Сравни цени на основни храни от Lidl, BILLA и Kaufland. Намери най-добрите оферти и спести пари.">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Сравни цени на основни храни от Lidl и Kaufland. Намери най-добрите оферти и спести пари.">
     
     <style>
         * {
@@ -20,9 +18,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-            -webkit-tap-highlight-color: transparent;
         }
         
         .container {
@@ -39,6 +34,7 @@
             color: white;
             padding: 30px;
             text-align: center;
+            position: relative;
         }
         
         .header h1 {
@@ -51,130 +47,167 @@
             opacity: 0.9;
         }
         
-        .visitor-info {
-            text-align: center;
-            padding: 15px;
-            background: #e3f2fd;
-            color: #1976d2;
-            font-weight: 500;
+        .admin-toggle {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
         }
         
-        .update-section {
-            background: #f8f9fa;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid #dee2e6;
+        .admin-toggle:hover {
+            background: rgba(255,255,255,0.3);
         }
         
-        .update-btn {
-            background: #28a745;
+        .admin-section {
+            background: #fff3cd;
+            padding: 25px;
+            border-bottom: 3px solid #ffc107;
+            display: none;
+        }
+        
+        .admin-section.active {
+            display: block;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .admin-status {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .upload-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        
+        .retailer-upload {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            border-top: 4px solid;
+        }
+        
+        .retailer-upload.lidl {
+            border-top-color: #0050AA;
+        }
+        
+        .retailer-upload.kaufland {
+            border-top-color: #FFD500;
+        }
+        
+        .retailer-logo {
+            width: 100px;
+            height: 60px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            border-radius: 8px;
+        }
+        
+        .retailer-logo.lidl {
+            background: #0050AA;
+            color: white;
+        }
+        
+        .retailer-logo.kaufland {
+            background: #FFD500;
+            color: black;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 15px 0;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .upload-area.success {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+        
+        .upload-area.processing {
+            border-color: #ffc107;
+            background: #fff8e1;
+        }
+        
+        .btn {
+            background: #667eea;
             color: white;
             padding: 12px 24px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
-            margin: 10px;
+            margin: 5px;
+            font-size: 14px;
             transition: all 0.3s ease;
         }
         
-        .update-btn:hover {
-            background: #218838;
+        .btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
-        .update-btn.share {
-            background: #1976d2;
+        .btn-success { background: #28a745; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-danger { background: #dc3545; }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
         }
         
-        .update-btn.share:hover {
-            background: #1565c0;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
-        .extraction-section {
-            background: #f8f9fa;
+        .public-section {
+            display: block;
+        }
+        
+        .week-info {
+            background: #e3f2fd;
             padding: 20px;
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .extraction-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-        
-        .retailer-extraction {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .retailer-extraction h4 {
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-        
-        .retailer-extraction.lidl h4 {
-            color: #0050AA;
-        }
-        
-        .retailer-extraction.billa h4 {
-            color: #E31E24;
-        }
-        
-        .retailer-extraction.kaufland h4 {
-            color: #FFD500;
-        }
-        
-        .extraction-textarea {
-            width: 100%;
-            height: 100px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            resize: vertical;
-            font-family: inherit;
-        }
-        
-        .extract-btn {
-            margin-top: 10px;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+            text-align: center;
+            color: #1976d2;
             font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .extract-btn.lidl {
-            background: #0050AA;
-            color: white;
-        }
-        
-        .extract-btn.billa {
-            background: #E31E24;
-            color: white;
-        }
-        
-        .extract-btn.kaufland {
-            background: #FFD500;
-            color: black;
-        }
-        
-        .extract-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        
-        .extraction-results {
-            margin-top: 20px;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            border-left: 4px solid #28a745;
-            display: none;
         }
         
         .stats-panel {
@@ -214,7 +247,6 @@
         }
         
         .lidl { color: #0050AA; }
-        .billa { color: #E31E24; }
         .kaufland { color: #FFD500; }
         .savings { color: #28a745; }
         
@@ -259,6 +291,7 @@
         
         .price-cell {
             font-weight: bold;
+            font-size: 16px;
         }
         
         .savings-cell {
@@ -266,102 +299,35 @@
             font-weight: bold;
         }
         
-        .edit-mode {
-            background: #fff3cd !important;
-            border: 2px solid #ffc107;
-        }
-        
-        .editable {
-            background: none;
-            border: none;
-            font-weight: bold;
-            width: 80px;
+        .no-data {
             text-align: center;
-            font-family: inherit;
+            padding: 40px;
+            color: #666;
         }
         
-        .editable:focus {
-            outline: 2px solid #667eea;
-            border-radius: 3px;
-        }
-        
-        .help-section {
-            background: #f8f9fa;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        .help-btn {
-            background: none;
-            border: 1px solid #667eea;
-            color: #667eea;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .help-btn:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        .help-content {
-            display: none;
-            margin-top: 20px;
-            text-align: left;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .help-content ol {
-            margin-left: 20px;
-        }
-        
-        .help-content li {
-            margin: 10px 0;
-            line-height: 1.5;
-        }
-        
-        .update-info {
+        .footer {
             text-align: center;
             padding: 20px;
             background: #e9ecef;
             color: #6c757d;
         }
         
-        .quick-actions {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
+        .share-section {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
         }
         
-        .fab {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #667eea;
+        .share-btn {
+            background: #1976d2;
             color: white;
+            padding: 10px 20px;
             border: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 24px;
-            margin: 10px 0;
-            display: block;
-            transition: all 0.3s ease;
-        }
-        
-        .fab:hover {
-            background: #5a6fd8;
-            transform: scale(1.1);
+            margin: 5px;
+            font-size: 14px;
         }
         
         @media (max-width: 768px) {
@@ -373,8 +339,8 @@
                 font-size: 2em;
             }
             
-            .header p {
-                font-size: 1em;
+            .upload-grid {
+                grid-template-columns: 1fr;
             }
             
             .stats-panel {
@@ -391,33 +357,12 @@
                 font-size: 0.9em;
             }
             
-            .extraction-section {
-                padding: 15px;
-            }
-            
-            .extraction-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .extraction-textarea {
-                height: 80px;
-            }
-            
-            .update-btn {
-                padding: 10px 16px;
-                font-size: 14px;
-                margin: 5px;
-            }
-            
-            .quick-actions {
-                bottom: 15px;
-                right: 15px;
-            }
-            
-            .fab {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
+            .admin-toggle {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-top: 15px;
+                display: block;
             }
         }
     </style>
@@ -426,400 +371,507 @@
     <div class="container">
         <div class="header">
             <h1>🛒 СпестиСмарт</h1>
-            <p>Сравни цени на основни храни | <span id="currentWeek"></span></p>
-        </div>
-        
-        <div class="visitor-info">
-            <p>👥 Посетители днес: <span id="visitor-count">1</span> | 💾 Данни запазени локално</p>
-        </div>
-        
-        <div class="update-section">
-            <h3>📝 Актуализирай цени</h3>
-            <p>Кликни "Редактирай цени" за да въведеш новите цени от брошурите</p>
-            <button class="update-btn" onclick="toggleEditMode()" id="editBtn">
-                Редактирай цени
-            </button>
-            <button class="update-btn" onclick="saveChanges()" id="saveBtn" style="display: none;">
-                Запази промените
-            </button>
-            <button class="update-btn share" onclick="shareWebsite()">
-                📤 Сподели сайта
+            <p>Сравни цени на основни храни | <span id="current-week"></span></p>
+            <button class="admin-toggle" onclick="toggleAdmin()">
+                👤 Admin Panel
             </button>
         </div>
         
-        <div class="extraction-section">
-            <h3>🔍 Бърза проверка на цени</h3>
-            <p>Копирай текст от брошурите и намери цените автоматично</p>
-            
-            <div class="extraction-grid">
-                <div class="retailer-extraction lidl">
-                    <h4>📄 Lidl брошура</h4>
-                    <textarea id="lidl-text" class="extraction-textarea" 
-                             placeholder="Копирай текст от Lidl брошурата тук..."></textarea>
-                    <button onclick="extractPrices('lidl')" class="extract-btn lidl">
-                        Извлечи цени
-                    </button>
-                </div>
-                
-                <div class="retailer-extraction billa">
-                    <h4>📄 BILLA брошура</h4>
-                    <textarea id="billa-text" class="extraction-textarea" 
-                             placeholder="Копирай текст от BILLA брошурата тук..."></textarea>
-                    <button onclick="extractPrices('billa')" class="extract-btn billa">
-                        Извлечи цени
-                    </button>
-                </div>
-                
-                <div class="retailer-extraction kaufland">
-                    <h4>📄 Kaufland брошура</h4>
-                    <textarea id="kaufland-text" class="extraction-textarea" 
-                             placeholder="Копирай текст от Kaufland брошурата тук..."></textarea>
-                    <button onclick="extractPrices('kaufland')" class="extract-btn kaufland">
-                        Извлечи цени
-                    </button>
+        <!-- ADMIN SECTION (Hidden by default) -->
+        <div class="admin-section" id="admin-section">
+            <div class="admin-header">
+                <h3>🔐 Admin Panel - Price Management</h3>
+                <div class="admin-status">
+                    ✅ Admin Mode Active
                 </div>
             </div>
             
-            <div id="extraction-results" class="extraction-results">
-                <h4>✅ Намерени цени:</h4>
-                <div id="found-prices"></div>
-                <button onclick="applyExtractedPrices()" class="update-btn">
-                    Приложи тези цени
+            <div class="upload-grid">
+                <div class="retailer-upload lidl">
+                    <div class="retailer-logo lidl">Lidl</div>
+                    <h4>Upload Lidl Weekly Brochure</h4>
+                    <div class="upload-area" id="lidl-upload" onclick="document.getElementById('lidl-file').click()">
+                        <div>
+                            <div style="font-size: 40px; margin-bottom: 10px;">📄</div>
+                            <p><strong>Click to upload Lidl PDF</strong></p>
+                            <p style="color: #666; margin: 10px 0;">Weekly deals brochure</p>
+                            <button type="button" class="btn">Choose PDF File</button>
+                        </div>
+                    </div>
+                    <input type="file" id="lidl-file" accept=".pdf" style="display: none;" onchange="processPDF('lidl', this.files[0])">
+                    <div id="lidl-status"></div>
+                </div>
+                
+                <div class="retailer-upload kaufland">
+                    <div class="retailer-logo kaufland">Kaufland</div>
+                    <h4>Upload Kaufland Weekly Brochure</h4>
+                    <div class="upload-area" id="kaufland-upload" onclick="document.getElementById('kaufland-file').click()">
+                        <div>
+                            <div style="font-size: 40px; margin-bottom: 10px;">📄</div>
+                            <p><strong>Click to upload Kaufland PDF</strong></p>
+                            <p style="color: #666; margin: 10px 0;">Weekly deals brochure</p>
+                            <button type="button" class="btn">Choose PDF File</button>
+                        </div>
+                    </div>
+                    <input type="file" id="kaufland-file" accept=".pdf" style="display: none;" onchange="processPDF('kaufland', this.files[0])">
+                    <div id="kaufland-status"></div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="publishPrices()" class="btn btn-success">
+                    🚀 Publish Updated Prices
+                </button>
+                <button onclick="clearAllData()" class="btn btn-danger">
+                    🗑️ Clear All Data
+                </button>
+                <button onclick="exportData()" class="btn btn-warning">
+                    💾 Export Data
                 </button>
             </div>
         </div>
         
-        <div class="stats-panel" id="stats-panel">
-            <div class="stat-card">
-                <div class="stat-number lidl" id="lidl-count">4</div>
-                <div class="stat-label">най-добри цени</div>
-                <div class="stat-store lidl">Lidl</div>
+        <!-- PUBLIC SECTION (Always visible) -->
+        <div class="public-section">
+            <div class="week-info">
+                <p>📅 Последно обновление: <span id="last-update">Няма данни</span></p>
+                <p>Цените се актуализират всяка седмица</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-number billa" id="billa-count">3</div>
-                <div class="stat-label">най-добри цени</div>
-                <div class="stat-store billa">BILLA</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number kaufland" id="kaufland-count">1</div>
-                <div class="stat-label">най-добри цени</div>
-                <div class="stat-store kaufland">Kaufland</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number savings" id="total-savings">3.30 лв</div>
-                <div class="stat-label">Общо спестени</div>
-                <div class="stat-store">от списъка</div>
-            </div>
-        </div>
-        
-        <div class="price-table">
-            <h2 style="margin-bottom: 20px; text-align: center;">📊 Сравнение на цени</h2>
-            <div class="table-container">
-                <table id="priceTable">
-                    <thead>
-                        <tr>
-                            <th>Продукт</th>
-                            <th class="lidl">🔵 Lidl</th>
-                            <th class="billa">🔴 BILLA</th>
-                            <th class="kaufland">🟡 Kaufland</th>
-                            <th>💰 Най-добра</th>
-                            <th>💵 Спестени</th>
-                        </tr>
-                    </thead>
-                    <tbody id="priceTableBody">
-                        <!-- Data will be loaded here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <div class="help-section">
-            <button onclick="toggleHelp()" class="help-btn">
-                ❓ Как да използвам сайта?
-            </button>
             
-            <div id="help-content" class="help-content">
-                <h4>📋 Инструкции:</h4>
-                <ol>
-                    <li><strong>Редактиране:</strong> Кликни "Редактирай цени" за да промениш цените директно в таблицата</li>
-                    <li><strong>Бърза проверка:</strong> Копирай текст от брошури в полетата по-горе за автоматично извличане на цени</li>
-                    <li><strong>Запазване:</strong> Винаги кликни "Запази промените" след редакция</li>
-                    <li><strong>Споделяне:</strong> Изпрати линка на приятели и семейство</li>
-                    <li><strong>Мобилен достъп:</strong> Сайтът работи отлично на телефон</li>
-                </ol>
-                <p><strong>💡 Съвет:</strong> Актуализирай цените всяка седмица в понеделник когато излизат новите брошури!</p>
+            <div class="stats-panel" id="stats-panel">
+                <div class="stat-card">
+                    <div class="stat-number lidl" id="lidl-count">-</div>
+                    <div class="stat-label">най-добри цени</div>
+                    <div class="stat-store lidl">Lidl</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number kaufland" id="kaufland-count">-</div>
+                    <div class="stat-label">най-добри цени</div>
+                    <div class="stat-store kaufland">Kaufland</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number savings" id="total-savings">- лв</div>
+                    <div class="stat-label">Общо спестени</div>
+                    <div class="stat-store">от списъка</div>
+                </div>
+            </div>
+            
+            <div class="price-table">
+                <h2 style="margin-bottom: 20px; text-align: center;">📊 Сравнение на цени</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Продукт</th>
+                                <th class="lidl">🔵 Lidl</th>
+                                <th class="kaufland">🟡 Kaufland</th>
+                                <th>💰 Най-добра</th>
+                                <th>💵 Спестени</th>
+                            </tr>
+                        </thead>
+                        <tbody id="price-table-body">
+                            <tr>
+                                <td colspan="5" class="no-data">
+                                    📄 Зареждане на данни...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="share-section">
+                <h4>📤 Сподели с приятели</h4>
+                <p style="margin-bottom: 15px;">Помогни на други да спестят пари!</p>
+                <button onclick="shareWebsite()" class="share-btn">
+                    📱 Сподели сайта
+                </button>
+                <button onclick="copyLink()" class="share-btn">
+                    🔗 Копирай линк
+                </button>
             </div>
         </div>
         
-        <div class="update-info">
-            <p>📅 Последно обновление: <span id="lastUpdate"></span></p>
-            <p>💡 Съвет: Проверявай цените всяка седмица в понеделник</p>
+        <div class="footer">
+            <p>💡 Съвет: Проверявай цените всяка седмица за най-добрите оферти</p>
+            <p style="margin-top: 10px; font-size: 12px;">
+                Данните се актуализират ръчно от администратора на сайта
+            </p>
         </div>
-    </div>
-
-    <div class="quick-actions">
-        <button class="fab" onclick="scrollToTop()" title="Към началото">↑</button>
-        <button class="fab" onclick="toggleEditMode()" title="Редактирай">✏️</button>
     </div>
 
     <script>
-        // Initial product data - you'll update these weekly
-        let groceryData = [
-            {name: 'Слънчогледово олио', unit: '1л', emoji: '🛢️', lidl: 2.89, billa: 3.45, kaufland: 3.29},
-            {name: 'Домати', unit: '1кг', emoji: '🍅', lidl: 3.99, billa: 2.49, kaufland: 2.99},
-            {name: 'Хляб бял', unit: '500г', emoji: '🍞', lidl: 1.29, billa: 0.99, kaufland: 1.19},
-            {name: 'Прясно мляко', unit: '1л', emoji: '🥛', lidl: 1.79, billa: 1.99, kaufland: 1.89},
-            {name: 'Яйца', unit: '10бр', emoji: '🥚', lidl: 4.49, billa: 4.29, kaufland: 3.99},
-            {name: 'Кашкавал', unit: '200г', emoji: '🧀', lidl: 3.99, billa: 4.69, kaufland: 4.29},
-            {name: 'Пилешко филе', unit: '1кг', emoji: '🍗', lidl: 8.99, billa: 7.49, kaufland: 8.29},
-            {name: 'Картофи', unit: '2кг', emoji: '🥔', lidl: 2.99, billa: 3.49, kaufland: 3.19},
-            {name: 'Тоалетна хартия', unit: '8 ролки', emoji: '🧻', lidl: 8.99, billa: 7.99, kaufland: 8.49}
+        // Product definitions
+        const products = [
+            {id: 'oil', name: 'Слънчогледово олио', unit: '1л', emoji: '🛢️'},
+            {id: 'tomatoes', name: 'Домати', unit: '1кг', emoji: '🍅'},
+            {id: 'bread', name: 'Хляб бял', unit: '500г', emoji: '🍞'},
+            {id: 'milk', name: 'Прясно мляко', unit: '1л', emoji: '🥛'},
+            {id: 'eggs', name: 'Яйца', unit: '10бр', emoji: '🥚'},
+            {id: 'cheese', name: 'Кашкавал', unit: '200г', emoji: '🧀'},
+            {id: 'chicken', name: 'Пилешко филе', unit: '1кг', emoji: '🍗'},
+            {id: 'potatoes', name: 'Картофи', unit: '2кг', emoji: '🥔'},
+            {id: 'toilet_paper', name: 'Тоалетна хартия', unit: '8 ролки', emoji: '🧻'}
         ];
         
-        let editMode = false;
-        let extractedPrices = {};
-        
-        // Product patterns for text extraction
-        const productPatterns = {
-            'олио': ['олио', 'слънчогледово', 'cooking oil'],
-            'домати': ['домати', 'tomato', 'чери'],
-            'хляб': ['хляб', 'bread', 'тост'],
-            'мляко': ['мляко', 'milk', 'прясно'],
-            'яйца': ['яйца', 'eggs', 'яйце'],
-            'кашкавал': ['кашкавал', 'сирене', 'cheese'],
-            'пилешко': ['пилешко', 'пиле', 'филе', 'chicken'],
-            'картофи': ['картофи', 'картоф', 'potatoes'],
-            'хартия': ['тоалетна', 'хартия', 'toilet paper']
+        // Price extraction patterns
+        const extractionPatterns = {
+            'oil': {
+                keywords: ['олио', 'слънчогледово', 'sunflower', 'растително'],
+                priceRange: [1.5, 8.0]
+            },
+            'tomatoes': {
+                keywords: ['домати', 'tomato', 'пресни', 'български'],
+                priceRange: [1.0, 8.0]
+            },
+            'bread': {
+                keywords: ['хляб', 'bread', 'бял', 'тост'],
+                priceRange: [0.5, 3.0]
+            },
+            'milk': {
+                keywords: ['мляко', 'milk', 'прясно', 'краве'],
+                priceRange: [1.0, 4.0]
+            },
+            'eggs': {
+                keywords: ['яйца', 'eggs', 'кокоши', 'пресни'],
+                priceRange: [2.0, 8.0]
+            },
+            'cheese': {
+                keywords: ['кашкавал', 'сирене', 'cheese', 'твърд'],
+                priceRange: [2.0, 12.0]
+            },
+            'chicken': {
+                keywords: ['пилешко', 'пиле', 'chicken', 'филе', 'гърди'],
+                priceRange: [4.0, 15.0]
+            },
+            'potatoes': {
+                keywords: ['картофи', 'картоф', 'potatoes', 'български'],
+                priceRange: [1.0, 5.0]
+            },
+            'toilet_paper': {
+                keywords: ['тоалетна хартия', 'toilet paper', 'хартия', 'ролки'],
+                priceRange: [3.0, 15.0]
+            }
         };
         
-        function loadPriceData() {
-            const tbody = document.getElementById('priceTableBody');
-            tbody.innerHTML = '';
-            
-            let stats = {lidl: 0, billa: 0, kaufland: 0, totalSavings: 0};
-            
-            groceryData.forEach((product, index) => {
-                const prices = [
-                    {store: 'lidl', price: product.lidl},
-                    {store: 'billa', price: product.billa},
-                    {store: 'kaufland', price: product.kaufland}
-                ];
-                
-                const bestPrice = Math.min(...prices.map(p => p.price));
-                const bestStore = prices.find(p => p.price === bestPrice).store;
-                const maxPrice = Math.max(...prices.map(p => p.price));
-                const savings = (maxPrice - bestPrice).toFixed(2);
-                
-                stats[bestStore]++;
-                stats.totalSavings += parseFloat(savings);
-                
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${product.emoji} <strong>${product.name}</strong> (${product.unit})</td>
-                    <td class="price-cell ${bestStore === 'lidl' ? 'best-price' : ''}">
-                        <input type="number" step="0.01" value="${product.lidl}" 
-                               class="editable" id="lidl-${index}" 
-                               ${editMode ? '' : 'readonly'} 
-                               onchange="updatePrice(${index}, 'lidl', this.value)"> лв
-                    </td>
-                    <td class="price-cell ${bestStore === 'billa' ? 'best-price' : ''}">
-                        <input type="number" step="0.01" value="${product.billa}" 
-                               class="editable" id="billa-${index}" 
-                               ${editMode ? '' : 'readonly'}
-                               onchange="updatePrice(${index}, 'billa', this.value)"> лв
-                    </td>
-                    <td class="price-cell ${bestStore === 'kaufland' ? 'best-price' : ''}">
-                        <input type="number" step="0.01" value="${product.kaufland}" 
-                               class="editable" id="kaufland-${index}" 
-                               ${editMode ? '' : 'readonly'}
-                               onchange="updatePrice(${index}, 'kaufland', this.value)"> лв
-                    </td>
-                    <td class="best-price">💰 ${bestStore.toUpperCase()}</td>
-                    <td class="savings-cell">${savings} лв</td>
-                `;
-                
-                tbody.appendChild(tr);
-            });
-            
-            // Update stats
-            document.getElementById('lidl-count').textContent = stats.lidl;
-            document.getElementById('billa-count').textContent = stats.billa;
-            document.getElementById('kaufland-count').textContent = stats.kaufland;
-            document.getElementById('total-savings').textContent = stats.totalSavings.toFixed(2) + ' лв';
-        }
+        // Admin state
+        let isAdminMode = false;
+        let currentPrices = {lidl: {}, kaufland: {}};
         
-        function toggleEditMode() {
-            editMode = !editMode;
-            const editBtn = document.getElementById('editBtn');
-            const saveBtn = document.getElementById('saveBtn');
-            const inputs = document.querySelectorAll('.editable');
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            loadPublishedPrices();
+            updateCurrentWeek();
             
-            if (editMode) {
-                editBtn.style.display = 'none';
-                saveBtn.style.display = 'inline-block';
-                inputs.forEach(input => {
-                    input.removeAttribute('readonly');
-                    input.parentElement.classList.add('edit-mode');
-                });
-            } else {
-                editBtn.style.display = 'inline-block';
-                saveBtn.style.display = 'none';
-                inputs.forEach(input => {
-                    input.setAttribute('readonly', true);
-                    input.parentElement.classList.remove('edit-mode');
-                });
+            // Check for admin mode in URL
+            if (window.location.hash === '#admin' || window.location.search.includes('admin=true')) {
+                toggleAdmin();
+            }
+        });
+        
+        function initializeApp() {
+            // Load any existing admin data
+            const savedPrices = localStorage.getItem('adminPrices');
+            if (savedPrices) {
+                currentPrices = JSON.parse(savedPrices);
             }
         }
         
-        function updatePrice(index, store, value) {
-            groceryData[index][store] = parseFloat(value);
-            // Auto-refresh the table to update best prices
-            setTimeout(() => {
-                loadPriceData();
-                if (editMode) {
-                    toggleEditMode(); // Re-enable edit mode
-                    toggleEditMode();
+        function toggleAdmin() {
+            isAdminMode = !isAdminMode;
+            const adminSection = document.getElementById('admin-section');
+            
+            if (isAdminMode) {
+                // Simple "password" check
+                const password = prompt('Enter admin password:');
+                if (password === 'admin123') { // Change this to your preferred password
+                    adminSection.classList.add('active');
+                    window.location.hash = '#admin';
+                } else {
+                    alert('Incorrect password!');
+                    isAdminMode = false;
                 }
-            }, 100);
+            } else {
+                adminSection.classList.remove('active');
+                window.location.hash = '';
+            }
         }
         
-        function saveChanges() {
-            // Save to localStorage for persistence
-            localStorage.setItem('groceryData', JSON.stringify(groceryData));
-            localStorage.setItem('lastUpdate', new Date().toLocaleDateString('bg-BG'));
+        async function processPDF(retailer, file) {
+            if (!file) return;
             
-            toggleEditMode();
-            loadPriceData();
-            alert('Цените са запазени успешно! 🎉');
+            const uploadArea = document.getElementById(`${retailer}-upload`);
+            const statusDiv = document.getElementById(`${retailer}-status`);
+            
+            // Show processing state
+            uploadArea.classList.add('processing');
+            statusDiv.innerHTML = `
+                <div style="text-align: center; margin-top: 15px;">
+                    <div class="spinner"></div>
+                    <p>Processing ${retailer.toUpperCase()} PDF...</p>
+                </div>
+            `;
+            
+            try {
+                // Load PDF.js dynamically
+                if (typeof pdfjsLib === 'undefined') {
+                    await loadPDFJS();
+                }
+                
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                
+                let allText = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    allText += pageText + '\n';
+                }
+                
+                // Extract prices
+                const extractedPrices = extractPricesFromText(allText);
+                
+                if (Object.keys(extractedPrices).length > 0) {
+                    currentPrices[retailer] = extractedPrices;
+                    showSuccessStatus(retailer, extractedPrices);
+                    
+                    // Save to admin storage
+                    localStorage.setItem('adminPrices', JSON.stringify(currentPrices));
+                } else {
+                    showErrorStatus(retailer, 'No prices found in PDF');
+                }
+                
+            } catch (error) {
+                console.error('PDF Error:', error);
+                showErrorStatus(retailer, error.message);
+            }
         }
         
-        function extractPrices(retailer) {
-            const text = document.getElementById(`${retailer}-text`).value.toLowerCase();
+        function extractPricesFromText(text) {
+            const prices = {};
             const lines = text.split('\n');
-            const found = {};
             
-            Object.keys(productPatterns).forEach(product => {
-                const patterns = productPatterns[product];
+            Object.keys(extractionPatterns).forEach(productId => {
+                const pattern = extractionPatterns[productId];
                 
                 for (let line of lines) {
-                    const hasKeyword = patterns.some(pattern => line.includes(pattern));
+                    const lineLower = line.toLowerCase();
+                    
+                    const hasKeyword = pattern.keywords.some(keyword =>
+                        lineLower.includes(keyword.toLowerCase())
+                    );
                     
                     if (hasKeyword) {
-                        // Look for price patterns: X.XX лв or X,XX лв
                         const priceMatch = line.match(/(\d+[.,]\d{2})/);
                         if (priceMatch) {
                             const price = parseFloat(priceMatch[1].replace(',', '.'));
-                            found[product] = price;
-                            break;
+                            if (price >= pattern.priceRange[0] && price <= pattern.priceRange[1]) {
+                                prices[productId] = price;
+                                break;
+                            }
                         }
                     }
                 }
             });
             
-            extractedPrices[retailer] = found;
-            displayExtractedPrices();
+            return prices;
         }
         
-        function displayExtractedPrices() {
-            const resultsDiv = document.getElementById('extraction-results');
-            const foundDiv = document.getElementById('found-prices');
+        function showSuccessStatus(retailer, prices) {
+            const uploadArea = document.getElementById(`${retailer}-upload`);
+            const statusDiv = document.getElementById(`${retailer}-status`);
             
-            let html = '';
-            let hasResults = false;
+            uploadArea.classList.remove('processing');
+            uploadArea.classList.add('success');
             
-            Object.keys(extractedPrices).forEach(retailer => {
-                const prices = extractedPrices[retailer];
-                if (Object.keys(prices).length > 0) {
-                    hasResults = true;
-                    html += `<div style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 5px;">`;
-                    html += `<strong style="color: ${retailer === 'lidl' ? '#0050AA' : retailer === 'billa' ? '#E31E24' : '#FFD500'};">${retailer.toUpperCase()}:</strong> `;
-                    Object.keys(prices).forEach(product => {
-                        html += `${product}: ${prices[product]} лв, `;
-                    });
-                    html = html.slice(0, -2); // Remove last comma
-                    html += '</div>';
+            let priceList = '';
+            Object.keys(prices).forEach(productId => {
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    priceList += `<span style="display: inline-block; background: #e8f5e8; padding: 3px 8px; margin: 2px; border-radius: 10px; font-size: 12px;">${product.emoji} ${product.name}: ${prices[productId]} лв</span>`;
                 }
             });
             
-            if (hasResults) {
-                foundDiv.innerHTML = html;
-                resultsDiv.style.display = 'block';
+            statusDiv.innerHTML = `
+                <div style="margin-top: 15px;">
+                    <p style="color: #28a745; font-weight: bold;">✅ Successfully extracted ${Object.keys(prices).length} prices</p>
+                    <div style="margin-top: 10px;">${priceList}</div>
+                </div>
+            `;
+        }
+        
+        function showErrorStatus(retailer, error) {
+            const uploadArea = document.getElementById(`${retailer}-upload`);
+            const statusDiv = document.getElementById(`${retailer}-status`);
+            
+            uploadArea.classList.remove('processing');
+            
+            statusDiv.innerHTML = `
+                <div style="margin-top: 15px; padding: 10px; background: #ffe6e6; border-radius: 5px;">
+                    <p style="color: #dc3545; font-weight: bold;">❌ Error: ${error}</p>
+                    <p style="color: #666; font-size: 12px; margin-top: 5px;">Try uploading a different PDF file</p>
+                </div>
+            `;
+        }
+        
+        function publishPrices() {
+            if (Object.keys(currentPrices.lidl).length === 0 && Object.keys(currentPrices.kaufland).length === 0) {
+                alert('No prices to publish! Please upload PDF files first.');
+                return;
+            }
+            
+            // Save to public storage
+            const publishData = {
+                prices: currentPrices,
+                lastUpdate: new Date().toISOString(),
+                week: getCurrentWeek()
+            };
+            
+            localStorage.setItem('publishedPrices', JSON.stringify(publishData));
+            
+            // Refresh public view
+            loadPublishedPrices();
+            
+            alert(`✅ Prices published successfully!\n\nLidl: ${Object.keys(currentPrices.lidl).length} products\nKaufland: ${Object.keys(currentPrices.kaufland).length} products`);
+        }
+        
+        function loadPublishedPrices() {
+            const published = localStorage.getItem('publishedPrices');
+            
+            if (published) {
+                const data = JSON.parse(published);
+                displayPriceComparison(data.prices);
+                document.getElementById('last-update').textContent = new Date(data.lastUpdate).toLocaleDateString('bg-BG');
             } else {
-                resultsDiv.style.display = 'none';
+                displayNoPrices();
             }
         }
         
-        function applyExtractedPrices() {
-            Object.keys(extractedPrices).forEach(retailer => {
-                const prices = extractedPrices[retailer];
+        function displayPriceComparison(prices) {
+            const tbody = document.getElementById('price-table-body');
+            tbody.innerHTML = '';
+            
+            let stats = {lidl: 0, kaufland: 0, totalSavings: 0};
+            let hasAnyPrices = false;
+            
+            products.forEach(product => {
+                const lidlPrice = prices.lidl[product.id];
+                const kauflandPrice = prices.kaufland[product.id];
                 
-                Object.keys(prices).forEach(productKey => {
-                    // Find matching product in groceryData
-                    groceryData.forEach((product, index) => {
-                        if (product.name.toLowerCase().includes(productKey)) {
-                            product[retailer] = prices[productKey];
-                        }
-                    });
-                });
+                if (lidlPrice || kauflandPrice) {
+                    hasAnyPrices = true;
+                    
+                    const validPrices = [];
+                    if (lidlPrice) validPrices.push({store: 'lidl', price: lidlPrice});
+                    if (kauflandPrice) validPrices.push({store: 'kaufland', price: kauflandPrice});
+                    
+                    const bestPrice = Math.min(...validPrices.map(p => p.price));
+                    const bestStore = validPrices.find(p => p.price === bestPrice).store;
+                    const maxPrice = Math.max(...validPrices.map(p => p.price));
+                    const savings = validPrices.length > 1 ? (maxPrice - bestPrice).toFixed(2) : '0.00';
+                    
+                    stats[bestStore]++;
+                    stats.totalSavings += parseFloat(savings);
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${product.emoji} <strong>${product.name}</strong> (${product.unit})</td>
+                        <td class="price-cell ${bestStore === 'lidl' ? 'best-price' : ''}">${lidlPrice ? lidlPrice.toFixed(2) + ' лв' : '-'}</td>
+                        <td class="price-cell ${bestStore === 'kaufland' ? 'best-price' : ''}">${kauflandPrice ? kauflandPrice.toFixed(2) + ' лв' : '-'}</td>
+                        <td class="best-price">💰 ${bestStore.toUpperCase()}</td>
+                        <td class="savings-cell">${savings} лв</td>
+                    `;
+                    tbody.appendChild(row);
+                }
             });
             
-            loadPriceData();
-            alert('Цените са приложени! Не забравяйте да ги запазите.');
+            if (!hasAnyPrices) {
+                displayNoPrices();
+                return;
+            }
             
-            // Clear extraction results
-            extractedPrices = {};
-            document.getElementById('extraction-results').style.display = 'none';
-            document.querySelectorAll('.extraction-textarea').forEach(textarea => {
-                textarea.value = '';
-            });
+            // Update stats
+            document.getElementById('lidl-count').textContent = stats.lidl;
+            document.getElementById('kaufland-count').textContent = stats.kaufland;
+            document.getElementById('total-savings').textContent = stats.totalSavings.toFixed(2) + ' лв';
+        }
+        
+        function displayNoPrices() {
+            const tbody = document.getElementById('price-table-body');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="no-data">
+                        📄 Все още няма публикувани цени за тази седмица.<br>
+                        <small>Проверете отново скоро!</small>
+                    </td>
+                </tr>
+            `;
+            
+            // Reset stats
+            document.getElementById('lidl-count').textContent = '-';
+            document.getElementById('kaufland-count').textContent = '-';
+            document.getElementById('total-savings').textContent = '- лв';
+        }
+        
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                localStorage.removeItem('adminPrices');
+                localStorage.removeItem('publishedPrices');
+                currentPrices = {lidl: {}, kaufland: {}};
+                
+                // Reset upload areas
+                document.getElementById('lidl-upload').classList.remove('success', 'processing');
+                document.getElementById('kaufland-upload').classList.remove('success', 'processing');
+                document.getElementById('lidl-status').innerHTML = '';
+                document.getElementById('kaufland-status').innerHTML = '';
+                
+                loadPublishedPrices();
+                alert('All data cleared successfully!');
+            }
+        }
+        
+        function exportData() {
+            const data = {
+                adminPrices: currentPrices,
+                publishedPrices: localStorage.getItem('publishedPrices'),
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `spesti-smart-data-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
         }
         
         function shareWebsite() {
             if (navigator.share) {
                 navigator.share({
                     title: 'СпестиСмарт - Сравни цени на храни',
-                    text: 'Вижте най-добрите цени на основни храни в България!',
-                    url: window.location.href
+                    text: 'Вижте най-добрите цени на основни храни от Lidl и Kaufland!',
+                    url: window.location.href.replace('#admin', '')
                 });
             } else {
-                // Fallback for desktop
-                navigator.clipboard.writeText(window.location.href).then(() => {
-                    alert('Линкът е копиран! Споделете го с приятели.');
-                }).catch(() => {
-                    // Fallback for older browsers
-                    const textArea = document.createElement('textarea');
-                    textArea.value = window.location.href;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    alert('Линкът е копиран! Споделете го с приятели.');
-                });
+                copyLink();
             }
         }
         
-        function toggleHelp() {
-            const helpContent = document.getElementById('help-content');
-            helpContent.style.display = helpContent.style.display === 'none' ? 'block' : 'none';
+        function copyLink() {
+            const url = window.location.href.replace('#admin', '');
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Линкът е копиран! Споделете го с приятели.');
+            });
         }
         
-        function scrollToTop() {
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }
-        
-        function loadSavedData() {
-            const saved = localStorage.getItem('groceryData');
-            const lastUpdate = localStorage.getItem('lastUpdate');
-            
-            if (saved) {
-                groceryData = JSON.parse(saved);
-            }
-            
-            if (lastUpdate) {
-                document.getElementById('lastUpdate').textContent = lastUpdate;
-            } else {
-                document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString('bg-BG');
-            }
+        function updateCurrentWeek() {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 1);
+            const week = Math.ceil((((now - start) / 86400000) + start.getDay() + 1) / 7);
+            document.getElementById('current-week').textContent = `Седмица ${week}, ${now.getFullYear()}`;
         }
         
         function getCurrentWeek() {
@@ -829,38 +881,23 @@
             return `Седмица ${week}, ${now.getFullYear()}`;
         }
         
-        function initVisitorCounter() {
-            let visitors = localStorage.getItem('visitors') || 0;
-            visitors++;
-            localStorage.setItem('visitors', visitors);
-            document.getElementById('visitor-count').textContent = visitors;
+        function loadPDFJS() {
+            return new Promise((resolve, reject) => {
+                if (typeof pdfjsLib !== 'undefined') {
+                    resolve();
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+                script.onload = () => {
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    resolve();
+                };
+                script.onerror = () => reject(new Error('Failed to load PDF.js'));
+                document.head.appendChild(script);
+            });
         }
-        
-        // Show/hide FAB based on scroll
-        window.addEventListener('scroll', () => {
-            const fab = document.querySelector('.quick-actions'); 
-            if (window.scrollY > 300) {
-                fab.style.opacity = '1';
-            } else {
-                fab.style.opacity = '0.7';
-            }
-        });
-        
-        // Load data when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            loadSavedData();
-            loadPriceData();
-            initVisitorCounter();
-            document.getElementById('currentWeek').textContent = getCurrentWeek();
-        });
-        
-        // Prevent form submission on Enter key in input fields
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && e.target.classList.contains('editable')) {
-                e.preventDefault();
-                e.target.blur();
-            }
-        });
     </script>
 </body>
 </html>
